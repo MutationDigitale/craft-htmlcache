@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.4.0 - 2022-01-07
+
+### Added
+- Empty cache when saving translations from translations-admin plugin
+
 ## 2.3.6 - 2021-12-08
 
 ### Fixed
