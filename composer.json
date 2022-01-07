@@ -29,5 +29,11 @@
     "schemaVersion": "1.0.0",
     "changelogUrl": "https://raw.githubusercontent.com/MutationDigitale/craft3-htmlcache/master/CHANGELOG.md",
     "class": "mutation\\filecache\\FileCachePlugin"
+  },
+  "config": {
+    "allow-plugins": {
+      "yiisoft/yii2-composer": true,
+      "craftcms/plugin-installer": true
+    }
   }
 }

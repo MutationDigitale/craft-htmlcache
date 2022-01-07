@@ -18,6 +18,7 @@ use craft\web\twig\variables\CraftVariable;
 use mutation\filecache\models\SettingsModel;
 use mutation\filecache\services\FileCacheService;
 use mutation\filecache\variables\FileCacheVariable;
+use mutation\translate\services\MessagesService;
 use yii\base\Event;
 
 class FileCachePlugin extends Plugin
@@ -85,6 +86,24 @@ class FileCachePlugin extends Plugin
 		Event::on(Elements::class, Elements::EVENT_AFTER_DELETE_ELEMENT, [$this, 'handleElementChange']);
 		Event::on(Elements::class, Elements::EVENT_AFTER_UPDATE_SLUG_AND_URI, [$this, 'handleElementChange']);
 
+		if (Craft::$app->plugins->isPluginEnabled('translations-admin')) {
+			Event::on(
+				MessagesService::class,
+				MessagesService::EVENT_AFTER_SAVE_MESSAGES,
+				[$this, 'handleTranslationsChange']
+			);
+			Event::on(
+				MessagesService::class,
+				MessagesService::EVENT_AFTER_ADD_MESSAGE,
+				[$this, 'handleTranslationsChange']
+			);
+			Event::on(
+				MessagesService::class,
+				MessagesService::EVENT_AFTER_DELETE_MESSAGES,
+				[$this, 'handleTranslationsChange']
+			);
+		}
+
 		Event::on(
 			CraftVariable::class,
 			CraftVariable::EVENT_INIT,
@@ -128,6 +147,12 @@ class FileCachePlugin extends Plugin
 			return;
 		}
 
+		$this->_deleteCaches = true;
+		Craft::$app->getResponse()->on(Response::EVENT_AFTER_PREPARE, [$this, 'handleResponse']);
+	}
+
+	public function handleTranslationsChange()
+	{
 		$this->_deleteCaches = true;
 		Craft::$app->getResponse()->on(Response::EVENT_AFTER_PREPARE, [$this, 'handleResponse']);
 	}
