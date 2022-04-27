@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.4.1 - 2022-04-27
+
+### Fixed
+- Serve cache when application is initialized instead of after plugins loaded
+
 ## 2.4.0 - 2022-01-07
 
 ### Added

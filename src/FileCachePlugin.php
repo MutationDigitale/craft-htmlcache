@@ -76,8 +76,7 @@ class FileCachePlugin extends Plugin
 
 	private function initEvents()
 	{
-		Event::on(Plugins::class, Plugins::EVENT_AFTER_LOAD_PLUGINS, [$this, 'handleAfterLoadPlugins']);
-
+		Craft::$app->on(Application::EVENT_INIT, [$this, 'handleApplicationInit']);
 		Craft::$app->on(Application::EVENT_AFTER_REQUEST, [$this, 'handleAfterRequest']);
 
 		Event::on(Elements::class, Elements::EVENT_AFTER_SAVE_ELEMENT, [$this, 'handleElementChange']);
@@ -115,7 +114,7 @@ class FileCachePlugin extends Plugin
 		);
 	}
 
-	public function handleAfterLoadPlugins()
+	public function handleApplicationInit()
 	{
 		$this->fileCacheService()->serveCache();
 	}
