@@ -3,6 +3,7 @@
 namespace mutation\filecache;
 
 use Craft;
+use craft\base\Model;
 use craft\base\Plugin;
 use craft\events\BatchElementActionEvent;
 use craft\events\DeleteElementEvent;
@@ -54,7 +55,7 @@ class FileCachePlugin extends Plugin
 		return $this->fileCache;
 	}
 
-	protected function createSettingsModel(): SettingsModel
+	protected function createSettingsModel(): ?Model
 	{
 		return new SettingsModel();
 	}

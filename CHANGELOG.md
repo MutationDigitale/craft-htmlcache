@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.0.0-beta.1 - 2022-08-02
+
+### Added
+- Initial Craft 4 support
+
 ## 2.4.1 - 2022-04-27
 
 ### Fixed
