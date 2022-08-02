@@ -9,6 +9,7 @@ use craft\elements\User;
 use craft\helpers\FileHelper;
 use craft\helpers\Html;
 use craft\helpers\StringHelper;
+use craft\web\Response;
 use mutation\filecache\FileCachePlugin;
 use mutation\filecache\models\SettingsModel;
 use RecursiveDirectoryIterator;
@@ -18,7 +19,7 @@ use function in_array;
 
 class FileCacheService extends Component
 {
-	public function writeCache()
+	public function writeCache(Response $response)
 	{
 		if (!$this->isCacheableRequest()) {
 			return;
@@ -26,7 +27,7 @@ class FileCacheService extends Component
 
 		$filePath = $this->getCacheFilePath();
 
-		FileHelper::writeToFile($filePath, trim(Craft::$app->response->data));
+		FileHelper::writeToFile($filePath, trim($response->content));
 	}
 
 	public function serveCache()
@@ -41,17 +42,20 @@ class FileCacheService extends Component
 			return;
 		}
 
-		Craft::$app->response->data = file_get_contents($filePath);
+		$response = Craft::$app->response;
 
-		$this->replaceVariables();
+		$response->content = file_get_contents($filePath);
 
-		Craft::$app->end();
+		$this->replaceVariables($response);
+
+		$response->send();
+		exit();
 	}
 
-	public function replaceVariables()
+	public function replaceVariables(Response $response)
 	{
-		$this->replaceCsrfInput();
-		$this->replaceJsCrsfToken();
+		$this->replaceCsrfInput($response);
+		$this->replaceJsCrsfToken($response);
 	}
 
 	public function deleteAllFileCaches()
@@ -159,36 +163,34 @@ class FileCacheService extends Component
 		return true;
 	}
 
-	private function replaceCsrfInput()
+	private function replaceCsrfInput(Response $response)
 	{
 		/** @var SettingsModel $settings */
 		$settings = FileCachePlugin::$plugin->getSettings();
 
 		$request = Craft::$app->getRequest();
-		$response = Craft::$app->getResponse();
 
-		if (!is_string($response->data) ||
-			strpos($response->data, $settings->csrfInputKey) === false) {
+		if (!is_string($response->content) ||
+			strpos($response->content, $settings->csrfInputKey) === false) {
 			return;
 		}
 
-		$response->data = str_replace(
+		$response->content = str_replace(
 			$settings->csrfInputKey,
 			Html::hiddenInput($request->csrfParam, $request->getCsrfToken()),
-			$response->data
+			$response->content
 		);
 	}
 
-	private function replaceJsCrsfToken()
+	private function replaceJsCrsfToken(Response $response)
 	{
 		/** @var SettingsModel $settings */
 		$settings = FileCachePlugin::$plugin->getSettings();
 
 		$request = Craft::$app->getRequest();
-		$response = Craft::$app->getResponse();
 
-		if (!is_string($response->data) ||
-			strpos($response->data, $settings->csrfJsTokenKey) === false) {
+		if (!is_string($response->content) ||
+			strpos($response->content, $settings->csrfJsTokenKey) === false) {
 			return;
 		}
 
@@ -201,10 +203,10 @@ class FileCacheService extends Component
 </script>
 HTML;
 
-		$response->data = str_replace(
+		$response->content = str_replace(
 			$settings->csrfJsTokenKey,
 			$script,
-			$response->data
+			$response->content
 		);
 	}
 
