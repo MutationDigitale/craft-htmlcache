@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.0.0 - 2022-11-25
+
+## Changed
+- Use Craft/Yii caching mechanism
+
 ## 3.0.0-beta.2 - 2022-08-02
 
 ### Fixed

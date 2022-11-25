@@ -6,6 +6,7 @@ use Craft;
 use craft\base\Component;
 use craft\elements\Entry;
 use craft\elements\User;
+use craft\helpers\App;
 use craft\helpers\FileHelper;
 use craft\helpers\Html;
 use craft\helpers\StringHelper;
@@ -25,9 +26,7 @@ class FileCacheService extends Component
 			return;
 		}
 
-		$filePath = $this->getCacheFilePath();
-
-		FileHelper::writeToFile($filePath, trim($response->content));
+		Craft::$app->getCache()->add($this->getCacheKey(), trim($response->content));
 	}
 
 	public function serveCache()
@@ -36,15 +35,15 @@ class FileCacheService extends Component
 			return;
 		}
 
-		$filePath = $this->getCacheFilePath();
+		$cachedContent = Craft::$app->getCache()->get($this->getCacheKey());
 
-		if (!file_exists($filePath)) {
+		if (!$cachedContent) {
 			return;
 		}
 
 		$response = Craft::$app->response;
 
-		$response->content = file_get_contents($filePath);
+		$response->content = $cachedContent;
 
 		$this->replaceVariables($response);
 
@@ -60,21 +59,7 @@ class FileCacheService extends Component
 
 	public function deleteAllFileCaches()
 	{
-		$dir = $this->_normalizePath($this->getFileCacheDirectory());
-
-		if (!is_dir($dir)) {
-			return;
-		}
-
-		$files = new RecursiveIteratorIterator(
-			new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
-			RecursiveIteratorIterator::CHILD_FIRST
-		);
-
-		foreach ($files as $fileInfo) {
-			$todo = ($fileInfo->isDir() ? 'rmdir' : 'unlink');
-			$todo($fileInfo->getRealPath());
-		}
+		Craft::$app->getCache()->flush();
 	}
 
 	private function isCacheableRequest(): bool
@@ -210,33 +195,8 @@ HTML;
 		);
 	}
 
-	private function getCacheFilePath(): string
+	private function getCacheKey(): array
 	{
-		$site = Craft::parseEnv(Craft::$app->sites->getCurrentSite()->baseUrl);
-		$path = Craft::$app->request->getPathInfo();
-
-		$pathSegments = [
-			$this->getFileCacheDirectory(),
-			$site,
-			$path
-		];
-
-		$targetPath = $this->_normalizePath(implode('/', $pathSegments));
-
-		return $targetPath . DIRECTORY_SEPARATOR . 'index.html';
-	}
-
-	private function getFileCacheDirectory(): string
-	{
-		/** @var SettingsModel $settings */
-		$settings = FileCachePlugin::$plugin->getSettings();
-
-		return Craft::$app->getPath()->getRuntimePath() . '/' . $settings->cacheFolderPath;
-	}
-
-	private function _normalizePath($path): string
-	{
-		$path = preg_replace('#https?://#', '', $path);
-		return FileHelper::normalizePath($path);
+		return ['MUTATION_FILE_CACHE', Craft::$app->sites->getCurrentSite()->handle, Craft::$app->request->getPathInfo()];
 	}
 }

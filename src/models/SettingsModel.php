@@ -12,11 +12,6 @@ class SettingsModel extends Model
 	public $cacheEnabled = true;
 
 	/**
-	 * @var string
-	 */
-	public $cacheFolderPath = 'filecache';
-
-	/**
 	 * @var array
 	 */
 	public $excludedEntrySections = [];
