@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.1 - 2023-05-15
+
+## Changed
+- Do not cache ajax requests
+- Take full path into account for cache key
+
 ## 3.0.0 - 2022-11-25
 
 ## Changed

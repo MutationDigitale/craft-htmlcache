@@ -79,6 +79,7 @@ class FileCacheService extends Component
 			$request->getIsConsoleRequest() ||
 			$request->getIsActionRequest() ||
 			$request->getIsPreview() ||
+			$request->getIsAjax() ||
 			$request->getToken() ||
 			!$response->getIsOk()) {
 			return false;
@@ -197,6 +198,6 @@ HTML;
 
 	private function getCacheKey(): array
 	{
-		return ['MUTATION_FILE_CACHE', Craft::$app->sites->getCurrentSite()->handle, Craft::$app->request->getPathInfo()];
+		return ['MUTATION_FILE_CACHE', Craft::$app->sites->getCurrentSite()->handle, Craft::$app->request->getPathInfo(true)];
 	}
 }
