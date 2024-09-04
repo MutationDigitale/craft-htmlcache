@@ -5,13 +5,9 @@ namespace mutation\filecache;
 use Craft;
 use craft\base\Model;
 use craft\base\Plugin;
-use craft\events\BatchElementActionEvent;
-use craft\events\DeleteElementEvent;
-use craft\events\ElementEvent;
 use craft\events\RegisterCacheOptionsEvent;
 use craft\helpers\ElementHelper;
 use craft\services\Elements;
-use craft\services\Plugins;
 use craft\utilities\ClearCaches;
 use craft\web\Application;
 use craft\web\Response;
@@ -133,14 +129,12 @@ class FileCachePlugin extends Plugin
 
 	public function handleElementChange(Event $event)
 	{
-		/** @var SettingsModel $settings */
 		$settings = $this->getSettings();
 
 		if (!$settings->cacheEnabled || Craft::$app->getConfig()->getGeneral()->devMode) {
 			return;
 		}
 
-		/** @var ElementEvent|BatchElementActionEvent|DeleteElementEvent $event */
 		$element = $event->element;
 
 		if ($element === null) {

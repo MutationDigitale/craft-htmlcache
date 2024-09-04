@@ -1,14 +1,19 @@
 # Changelog
 
+## 4.0.0 - 2023-05-15
+
+### Added
+- Craft 5 support
+
 ## 3.0.1 - 2023-05-15
 
-## Changed
+### Changed
 - Do not cache ajax requests
 - Take full path into account for cache key
 
 ## 3.0.0 - 2022-11-25
 
-## Changed
+### Changed
 - Use Craft/Yii caching mechanism
 
 ## 3.0.0-beta.2 - 2022-08-02
